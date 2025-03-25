@@ -1,42 +1,21 @@
 import express from 'express';
+import {
+  createAFruit,
+  getAllFruits,
+  getFruitById
+} from './src/controllers/fruits.controller.js';
 
 const app = express(); // instance (singleton)
-
-const fruits = []; // in memory
 
 // middleware
 app.use(express.json());
 
-app.get('/fruits', (request, response) => {
-  response.send({
-    message: 'Fruits in the storage',
-    fruits
-  });
-});
+// Routes
+app.get('/fruits', getAllFruits);
+app.get('/fruit/:id', getFruitById);
+app.post('/fruit', createAFruit);
 
-app.post('/fruit', (req, res) => {
-  const { fruit } = req.body;
-  if (!!fruit) {
-    // Add validation to prevent repeated fruits
-    fruits.push(fruit);
-  }
-
-  res.send({
-    message: 'Fruit is in the storage',
-    ok: true
-  });
-});
-
-app.get('/fruit/:id', (req, res) => {
-  // const fruitId = req.params.id
-  const { id } = req.params;
-
-  console.log(req.query);
-  console.log({ param: id });
-
-  res.send({ id });
-});
-
+// listen
 app.listen(5000, (error) => {
   if (error) {
     console.log({ error });
