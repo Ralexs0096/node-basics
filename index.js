@@ -27,6 +27,16 @@ app.post('/fruit', (req, res) => {
   });
 });
 
+app.get('/fruit/:id', (req, res) => {
+  // const fruitId = req.params.id
+  const { id } = req.params;
+
+  console.log(req.query);
+  console.log({ param: id });
+
+  res.send({ id });
+});
+
 app.listen(5000, (error) => {
   if (error) {
     console.log({ error });
