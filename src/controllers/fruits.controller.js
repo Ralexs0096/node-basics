@@ -1,4 +1,43 @@
-const fruits = []; // in memory
+import fs from 'fs';
+import path from 'path';
+
+const FILE_PATH = path.join(process.cwd(), 'fruits.txt');
+const fruits = []; 
+
+fs.exists(FILE_PATH, (exists) => {
+    if (exists) {
+        fs.readFile(FILE_PATH, 'utf-8', (err, fileContent) => {
+            if (err) {
+                console.error("Error reading fruits file:", err);
+                // Continue with an empty 'fruits' array if loading failed
+                return;
+            }
+            const loadedFruits = fileContent.split('\n').filter(fruit => fruit.trim() !== '');
+            fruits.push(...loadedFruits);
+            console.log(`Loaded ${fruits.length} fruits from ${FILE_PATH}`);
+        });
+    } else {
+        fs.writeFile(FILE_PATH, '', 'utf-8', (err) => {
+            if (err) {
+                console.error("Error creating empty fruits file:", err);
+                // In a real app, you might want to handle this more gracefully
+                return;
+            }
+            console.log(`Created empty fruits file: ${FILE_PATH}`);
+        });
+    }
+});
+
+const saveFruits = () => {
+    const dataToWrite = fruits.join('\n'); // Join array elements with newline
+    fs.writeFile(FILE_PATH, dataToWrite, 'utf-8', (err) => {
+        if (err) {
+            // Log an error if saving fails, but the app will continue running
+            console.error("Error saving fruits to file:", err);
+            // In a real app, you might want to handle this more gracefully
+        }
+    });
+};
 
 export const getAllFruits = (_, response) => {
   response.send({
@@ -25,9 +64,10 @@ export const createAFruit = (req, res) => {
   }
 
   fruits.push(fruit);
+  saveFruits();
 
   res.status(201).send({
-    message: 'Fruit has been added to the storage',
+    message: `Fruit '${fruit}' has been added to the storage`,
     ok: true
   });
 };
