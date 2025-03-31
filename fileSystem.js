@@ -1,12 +1,12 @@
 import fs from 'fs';
 
-fs.writeFile('text.pdf', 'This is a second test', 'utf-8', () => {
+fs.writeFile('text.txt', 'This is a first item', 'utf-8', () => {
   console.log('file created');
 });
 
-fs.appendFileSync(
+fs.appendFile(
   './text.txt',
-  '\nCarlos is asking if this value is going to overwrite the previous one',
+  '\nThis is a second item',
   'utf-8'
 );
 
