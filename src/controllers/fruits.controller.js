@@ -4,28 +4,30 @@ import path from 'path';
 const FILE_PATH = path.join(process.cwd(), 'fruits.txt');
 const fruits = []; 
 
-fs.exists(FILE_PATH, (exists) => {
-    if (exists) {
-        fs.readFile(FILE_PATH, 'utf-8', (err, fileContent) => {
-            if (err) {
-                console.error("Error reading fruits file:", err);
-                // Continue with an empty 'fruits' array if loading failed
-                return;
-            }
-            const loadedFruits = fileContent.split('\n').filter(fruit => fruit.trim() !== '');
-            fruits.push(...loadedFruits);
-            console.log(`Loaded ${fruits.length} fruits from ${FILE_PATH}`);
-        });
-    } else {
-        fs.writeFile(FILE_PATH, '', 'utf-8', (err) => {
-            if (err) {
-                console.error("Error creating empty fruits file:", err);
-                // In a real app, you might want to handle this more gracefully
+// --- Initialization: Load fruits from file on startup ---
+fs.access(FILE_PATH, fs.constants.F_OK, (err) => {
+    if (err) {
+        // File does not exist or other error occurred
+        fs.writeFile(FILE_PATH, '', 'utf-8', (writeErr) => {
+            if (writeErr) {
+                console.error("Error creating empty fruits file:", writeErr);
                 return;
             }
             console.log(`Created empty fruits file: ${FILE_PATH}`);
         });
+        return;
     }
+
+    // File exists, so read it
+    fs.readFile(FILE_PATH, 'utf-8', (readErr, fileContent) => {
+        if (readErr) {
+            console.error("Error reading fruits file:", readErr);
+            return;
+        }
+        const loadedFruits = fileContent.split('\n').filter(fruit => fruit.trim() !== '');
+        fruits.push(...loadedFruits);
+        console.log(`Loaded ${fruits.length} fruits from ${FILE_PATH}`);
+    });
 });
 
 const saveFruits = () => {
