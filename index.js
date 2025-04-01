@@ -1,9 +1,9 @@
-import express from 'express';
+import express from "express";
 import {
   createAFruit,
   getAllFruits,
-  getFruitById
-} from './src/controllers/fruits.controller.js';
+  getFruitById,
+} from "./src/controllers/fruits.controller.js";
 
 const app = express(); // instance (singleton)
 
@@ -11,9 +11,9 @@ const app = express(); // instance (singleton)
 app.use(express.json());
 
 // Routes
-app.get('/fruits', getAllFruits);
-app.get('/fruit/:id', getFruitById);
-app.post('/fruit', createAFruit);
+app.get("/fruits", getAllFruits);
+app.get("/fruit/:id", getFruitById);
+app.post("/fruit", createAFruit);
 
 // listen
 app.listen(5000, (error) => {
@@ -21,5 +21,5 @@ app.listen(5000, (error) => {
     console.log({ error });
   }
 
-  console.log('Server running on port 5000');
+  console.log("Server running on port 5000");
 });
