@@ -2,21 +2,27 @@ const fruits = []; // in memory
 
 export const getAllFruits = (_, response) => {
   response.send({
-    message: 'Fruits in the storage',
-    fruits
+    message: "Fruits in the storage",
+    fruits,
   });
 };
 
 export const createAFruit = (req, res) => {
   const { fruit } = req.body;
-  if (!!fruit) {
-    // Add validation to prevent repeated fruits
-    fruits.push(fruit);
+
+  if (!fruit) {
+    return res.status(400).send({ message: "Fruit is required", ok: false });
   }
 
+  if (fruits.includes(fruit)) {
+    return res.status(400).send({ message: "Fruit already exists", ok: false });
+  }
+
+  fruits.push(fruit);
+
   res.send({
-    message: 'Fruit is in the storage',
-    ok: true
+    message: "Fruit is in the storage",
+    ok: true,
   });
 };
 
