@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { verifyIfFileExist } from '../utils/filesystem.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -8,7 +9,7 @@ const filePath = path.join(__dirname, 'storage.txt');
 
 export const getAllFruits = (_, response) => {
   const emptyMessage = 'There are not fruits in the storage';
-  const isFruitFileCreated = fs.existsSync(filePath);
+  const isFruitFileCreated = verifyIfFileExist(filePath);
 
   if (!isFruitFileCreated) {
     response.send({
@@ -46,7 +47,7 @@ export const createFruit = (req, res) => {
     return;
   }
 
-  const isFruitFileCreated = fs.existsSync(filePath);
+  const isFruitFileCreated = verifyIfFileExist(filePath);
 
   if (!isFruitFileCreated) {
     fs.writeFile(filePath, parsedFruit, 'utf-8', () => {
@@ -66,6 +67,12 @@ export const getFruitById = (req, res) => {
 
   console.log(req.query);
   console.log({ param: id });
+
+  // const fruit = {
+  //   id: 1,
+  //   name: 'orange',
+  //   creator: 'Carlos'
+  // }
 
   res.send({ id });
 };
