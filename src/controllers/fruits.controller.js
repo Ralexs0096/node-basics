@@ -4,14 +4,15 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const filePath = path.join(__dirname, 'fruits.txt');
+const filePath = path.join(__dirname, 'storage.txt');
 
 export const getAllFruits = (_, response) => {
+  const emptyMessage = 'There are not fruits in the storage';
   const isFruitFileCreated = fs.existsSync(filePath);
 
   if (!isFruitFileCreated) {
     response.send({
-      message: 'There are not fruits in the storage'
+      message: emptyMessage
     });
     return;
   }
@@ -20,7 +21,7 @@ export const getAllFruits = (_, response) => {
 
   if (content === '') {
     response.send({
-      message: 'There are not fruits in the storage'
+      message: emptyMessage
     });
     return;
   }
@@ -31,16 +32,31 @@ export const getAllFruits = (_, response) => {
   });
 };
 
-export const createAFruit = (req, res) => {
+export const createFruit = (req, res) => {
   const { fruit } = req.body;
-  if (!!fruit) {
-    // Add validation to prevent repeated fruits
-    fruits.push(fruit);
+  const parsedFruit = fruit.toLowerCase();
+  const successResponse = {
+    message: 'Fruit is in the storage'
+  };
+
+  if (!fruit) {
+    res.send({
+      message: 'Fruit name is required'
+    });
+    return;
   }
 
-  res.send({
-    message: 'Fruit is in the storage',
-    ok: true
+  const isFruitFileCreated = fs.existsSync(filePath);
+
+  if (!isFruitFileCreated) {
+    fs.writeFile(filePath, parsedFruit, 'utf-8', () => {
+      res.send(successResponse);
+    });
+    return;
+  }
+
+  fs.appendFile(filePath, `\n${parsedFruit}`, 'utf-8', () => {
+    res.send(successResponse);
   });
 };
 
