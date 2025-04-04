@@ -1,4 +1,41 @@
-const fruits = []; // in memory
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const FILE_PATH = path.join(__dirname, "fruits.txt");
+const fruits = [];
+
+const initializeStorage = async () => {
+  try {
+    const fileContent = await fs
+      .readFile(FILE_PATH, "utf-8")
+      .catch(async () => {
+        await fs.writeFile(FILE_PATH, "", "utf-8");
+        return "";
+      });
+
+    fruits.push(
+      ...fileContent.split("\n").filter((fruit) => fruit.trim() !== "")
+    );
+    console.log(`Loaded ${fruits.length} fruits from ${FILE_PATH}`);
+  } catch (err) {
+    console.error("Error initializing the fruits file:", err);
+  }
+};
+
+const saveFruits = async () => {
+  try {
+    await fs.writeFile(FILE_PATH, fruits.join("\n"), "utf-8");
+  } catch (err) {
+    console.error("Error saving fruits:", err);
+  }
+};
+
+initializeStorage();
+
+export { fruits, saveFruits };
 
 export const getAllFruits = (_, response) => {
   response.send({
@@ -7,7 +44,7 @@ export const getAllFruits = (_, response) => {
   });
 };
 
-export const createAFruit = (req, res) => {
+export const createAFruit = async (req, res) => {
   const { fruit } = req.body;
 
   if (!fruit) {
@@ -19,6 +56,7 @@ export const createAFruit = (req, res) => {
   }
 
   fruits.push(fruit);
+  await saveFruits();
 
   res.send({
     message: "Fruit is in the storage",
@@ -27,7 +65,6 @@ export const createAFruit = (req, res) => {
 };
 
 export const getFruitById = (req, res) => {
-  // const fruitId = req.params.id
   const { id } = req.params;
 
   console.log(req.query);
