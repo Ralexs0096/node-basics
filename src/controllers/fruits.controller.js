@@ -2,35 +2,41 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { verifyIfFileExist } from '../utils/filesystem.js';
+import { getDbConnection } from '../config/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const filePath = path.join(__dirname, 'storage.txt');
 
-export const getAllFruits = (_, response) => {
-  const emptyMessage = 'There are not fruits in the storage';
-  const isFruitFileCreated = verifyIfFileExist(filePath);
+export const getAllFruits = async (_, response) => {
+  const connection = await getDbConnection();
 
-  if (!isFruitFileCreated) {
-    response.send({
-      message: emptyMessage
-    });
-    return;
-  }
+  const [results, fields] = await connection.query('SELECT * FROM tbl_fruits');
+  console.log('fruits from the DB', results, fields);
+  // const emptyMessage = 'There are not fruits in the storage';
+  // const isFruitFileCreated = verifyIfFileExist(filePath);
 
-  const content = fs.readFileSync(filePath, 'utf-8');
+  // if (!isFruitFileCreated) {
+  //   response.send({
+  //     message: emptyMessage
+  //   });
+  //   return;
+  // }
 
-  if (content === '') {
-    response.send({
-      message: emptyMessage
-    });
-    return;
-  }
+  // const content = fs.readFileSync(filePath, 'utf-8');
 
-  response.send({
-    message: 'Fruits in the Store',
-    fruits: content.split('\n')
-  });
+  // if (content === '') {
+  //   response.send({
+  //     message: emptyMessage
+  //   });
+  //   return;
+  // }
+
+  // response.send({
+  //   message: 'Fruits in the Store',
+  //   fruits: content.split('\n')
+  // });
+  response.send();
 };
 
 export const createFruit = (req, res) => {
