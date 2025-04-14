@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { getDbConnection } from '../config/database.js';
 
 const FILE_PATH = path.join(process.cwd(), 'fruits.txt');
 const fruits = []; 
@@ -31,15 +32,43 @@ fs.access(FILE_PATH, fs.constants.F_OK, (err) => {
 });
 
 const saveFruits = () => {
-    const dataToWrite = fruits.join('\n'); // Join array elements with newline
+    const dataToWrite = fruits.join('\n'); 
     fs.writeFile(FILE_PATH, dataToWrite, 'utf-8', (err) => {
         if (err) {
-            // Log an error if saving fails, but the app will continue running
             console.error("Error saving fruits to file:", err);
-            // In a real app, you might want to handle this more gracefully
         }
     });
 };
+
+const printFruitsFromDb = async () => {
+    let connection; 
+    console.log("Attempting DB connection and query...");
+    try {
+        // Get a connection object using your function
+        connection = await getDbConnection();
+        console.log("DB Connection successful!");
+
+        // Execute the SELECT query
+        console.log("Querying tbl_fruits...");
+        const [results] = await connection.query('SELECT * FROM tbl_fruits');
+
+        console.log("--- Fruits from Database ---");
+        console.log(results); 
+        console.log("---------------------------");
+
+    } catch (error) {
+        console.error("Error connecting to DB or querying:", error);
+    } finally {
+        // IMPORTANT: Close the connection when done (whether successful or not)
+        if (connection) {
+            console.log("Closing DB connection...");
+            await connection.end();
+            console.log("DB Connection closed.");
+        }
+    }
+};
+
+printFruitsFromDb();
 
 export const getAllFruits = (_, response) => {
   response.send({
