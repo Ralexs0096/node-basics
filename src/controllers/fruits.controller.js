@@ -42,28 +42,17 @@ const saveFruits = () => {
 
 const printFruitsFromDb = async () => {
     let connection; 
-    console.log("Attempting DB connection and query...");
     try {
-        // Get a connection object using your function
         connection = await getDbConnection();
-        console.log("DB Connection successful!");
-
-        // Execute the SELECT query
-        console.log("Querying tbl_fruits...");
+        console.log("DB Connection successful!... querying table...");
         const [results] = await connection.query('SELECT * FROM tbl_fruits');
-
         console.log("--- Fruits from Database ---");
-        console.log(results); 
-        console.log("---------------------------");
-
+        console.table(results);
     } catch (error) {
         console.error("Error connecting to DB or querying:", error);
     } finally {
-        // IMPORTANT: Close the connection when done (whether successful or not)
         if (connection) {
-            console.log("Closing DB connection...");
             await connection.end();
-            console.log("DB Connection closed.");
         }
     }
 };
