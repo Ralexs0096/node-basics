@@ -1,45 +1,32 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { verifyIfFileExist } from '../utils/filesystem.js';
 import { getDbConnection } from '../config/db.js';
+import {
+  createFruitsQuery,
+  getAllFruitsQuery
+} from '../query/fruitsQueries.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const filePath = path.join(__dirname, 'storage.txt');
+const errorMessage = {
+  message: 'Something went wrong!'
+};
 
 export const getAllFruits = async (_, response) => {
   const connection = await getDbConnection();
+  if (!connection) {
+    response.status(500).send(errorMessage);
+  }
 
-  const [results, fields] = await connection.query('SELECT * FROM tbl_fruits');
-  console.log('fruits from the DB', results, fields);
-  // const emptyMessage = 'There are not fruits in the storage';
-  // const isFruitFileCreated = verifyIfFileExist(filePath);
+  try {
+    const [results] = await connection.query(getAllFruitsQuery);
 
-  // if (!isFruitFileCreated) {
-  //   response.send({
-  //     message: emptyMessage
-  //   });
-  //   return;
-  // }
-
-  // const content = fs.readFileSync(filePath, 'utf-8');
-
-  // if (content === '') {
-  //   response.send({
-  //     message: emptyMessage
-  //   });
-  //   return;
-  // }
-
-  // response.send({
-  //   message: 'Fruits in the Store',
-  //   fruits: content.split('\n')
-  // });
-  response.send();
+    response.send({
+      fruits: results
+    });
+  } catch (error) {
+    console.log(error);
+    response.status(500).send(errorMessage);
+  }
 };
 
-export const createFruit = (req, res) => {
+export const createFruit = async (req, res) => {
   const { fruit } = req.body;
   const parsedFruit = fruit.toLowerCase();
   const successResponse = {
@@ -53,18 +40,20 @@ export const createFruit = (req, res) => {
     return;
   }
 
-  const isFruitFileCreated = verifyIfFileExist(filePath);
+  const connection = await getDbConnection();
 
-  if (!isFruitFileCreated) {
-    fs.writeFile(filePath, parsedFruit, 'utf-8', () => {
-      res.send(successResponse);
-    });
-    return;
+  if (!connection) {
+    response.status(500).send(errorMessage);
   }
 
-  fs.appendFile(filePath, `\n${parsedFruit}`, 'utf-8', () => {
-    res.send(successResponse);
-  });
+  try {
+    await connection.query(createFruitsQuery, [parsedFruit, 'Admin']);
+  } catch (error) {
+    console.log(error);
+    res.send(errorMessage);
+  }
+
+  res.send(successResponse);
 };
 
 export const getFruitById = (req, res) => {
