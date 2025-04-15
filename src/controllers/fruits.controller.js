@@ -69,10 +69,11 @@ export const getAllFruits = (_, response) => {
 export const createAFruit = (req, res) => {
   const { fruit } = req.body;
   if (!fruit) {
-    return res.status(400).send({
+     res.status(400).send({
       message: 'Fruit name is required',
       ok: false
     });
+    return;
   }
 
   // Validation to prevent repeated fruits
