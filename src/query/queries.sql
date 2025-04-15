@@ -18,3 +18,8 @@ VALUES
 (1, "banana", "Admin"),
 (2, "apple", "Admin"),
 (3, "mango", "Admin");
+
+
+ALTER TABLE tbl_fruits ADD PRIMARY KEY (id);
+
+ALTER TABLE node_db.tbl_fruits MODIFY COLUMN id int auto_increment NULL;
