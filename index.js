@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-  createAFruit,
+  createFruit,
   getAllFruits,
   getFruitById
 } from './src/controllers/fruits.controller.js';
@@ -13,7 +13,7 @@ app.use(express.json());
 // Routes
 app.get('/fruits', getAllFruits);
 app.get('/fruit/:id', getFruitById);
-app.post('/fruit', createAFruit);
+app.post('/fruit', createFruit);
 
 // listen
 app.listen(5000, (error) => {

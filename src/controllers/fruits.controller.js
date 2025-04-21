@@ -4,7 +4,7 @@ import {
     getFruitByIdQuery,
     createFruitQuery,
     deleteFruitByIdQuery
-} from '../query/fruitsQueries.js'; 
+} from '../queries/fruitsQueries.js'; 
 
 const errorMessage = { message: 'Something went wrong on the server.' };
 const notFoundMessage = { message: 'Fruit not found.' };
