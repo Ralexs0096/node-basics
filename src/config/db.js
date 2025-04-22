@@ -1,15 +1,18 @@
-import mysql from 'mysql2/promise';
+import knex from 'knex';
 
 export const getDbConnection = async () => {
   try {
-    const connection = await mysql.createConnection({
-      host: 'localhost',
-      user: 'root',
-      database: 'node_db',
-      password: 'ThisIsTheRootPassword'
+    const db = knex({
+      client: 'mysql2',
+      connection: {
+        host: 'localhost',
+        port: 3306,
+        user: 'root',
+        database: 'node_db',
+        password: 'ThisIsTheRootPassword'
+      }
     });
-
-    return connection;
+    return db;
   } catch (error) {
     console.log(error);
     return undefined;
