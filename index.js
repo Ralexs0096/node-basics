@@ -2,7 +2,8 @@ import express from 'express';
 import {
   createFruit,
   getAllFruits,
-  getFruitById
+  getFruitById,
+  deleteFruitById
 } from './src/controllers/fruits.controller.js';
 
 const app = express(); // instance (singleton)
@@ -14,6 +15,7 @@ app.use(express.json());
 app.get('/fruits', getAllFruits);
 app.get('/fruit/:id', getFruitById);
 app.post('/fruit', createFruit);
+app.delete('/fruit/:id', deleteFruitById);
 
 // listen
 app.listen(5000, (error) => {
