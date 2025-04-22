@@ -8,14 +8,16 @@ const errorMessage = {
   message: 'Something went wrong!'
 };
 
+const fruitsTable = 'tbl_fruits';
+
 export const getAllFruits = async (_, response) => {
-  const connection = await getDbConnection();
-  if (!connection) {
+  const knex = await getDbConnection();
+  if (!knex) {
     response.status(500).send(errorMessage);
   }
 
   try {
-    const [results] = await connection.query(getAllFruitsQuery);
+    const results = await knex.select().from(fruitsTable);
 
     response.send({
       fruits: results
@@ -40,14 +42,15 @@ export const createFruit = async (req, res) => {
     return;
   }
 
-  const connection = await getDbConnection();
+  const knex = await getDbConnection();
 
-  if (!connection) {
+  if (!knex) {
     response.status(500).send(errorMessage);
   }
 
   try {
-    await connection.query(createFruitsQuery, [parsedFruit, 'Admin']);
+    // await connection.query(createFruitsQuery, [parsedFruit, 'Admin']);
+    await knex(fruitsTable).insert({ name: parsedFruit, createdBy: 'Admin' });
   } catch (error) {
     console.log(error);
     res.send(errorMessage);
