@@ -1,14 +1,117 @@
-import { getDbConnection } from '../config/database.js'; 
-import {
-    getAllFruitsQuery,
-    getFruitByIdQuery,
-    createFruitQuery,
-    deleteFruitByIdQuery
-} from '../queries/fruitsQueries.js'; 
+import db from '../config/database.js';
 
 const errorMessage = { message: 'Something went wrong on the server.' };
 const notFoundMessage = { message: 'Fruit not found.' };
 
+export const getAllFruits = async (_, res) => {
+  try {
+    const fruits = await db('tbl_fruits').select('id', 'name', 'createdBy');
+    res.status(200).json({
+      message: 'Fruits retrieved successfully',
+      data: { fruits },
+      success: true
+    });
+  } catch (error) {
+    console.error("Error fetching all fruits:", error);
+    res.status(500).json({ ...errorMessage, success: false });
+  }
+};
+
+export const createFruit = async (req, res) => {
+  const { fruit } = req.body;
+  const createdBy = 'Admin';
+
+  if (!fruit || typeof fruit !== 'string' || fruit.trim() === '') {
+    return res.status(400).json({
+      message: 'Fruit name is required and must be a non-empty string',
+      success: false
+    });
+  }
+
+  const parsedFruit = fruit.trim().toLowerCase();
+
+  try {
+    const existingFruit = await db('tbl_fruits')
+      .whereRaw('LOWER(name) = ?', [parsedFruit])
+      .first();
+
+    if (existingFruit) {
+      return res.status(409).json({
+        message: `Fruit '${parsedFruit}' already exists`,
+        success: false
+      });
+    }
+
+    const [insertedId] = await db('tbl_fruits').insert({ name: parsedFruit, createdBy });
+    res.status(201).json({
+      message: `Fruit '${parsedFruit}' added successfully`,
+      data: { insertedId },
+      success: true
+    });
+  } catch (error) {
+    console.error("Error creating fruit:", error);
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({
+        message: `Fruit '${parsedFruit}' already exists`,
+        success: false
+      });
+    }
+    res.status(500).json({ ...errorMessage, success: false });
+  }
+};
+
+export const getFruitById = async (req, res) => {
+  const { id } = req.params;
+
+  if (!/^\d+$/.test(id) || parseInt(id, 10) <= 0) {
+    return res.status(400).json({
+      message: 'Invalid ID format. ID must be a positive integer',
+      success: false
+    });
+  }
+
+  try {
+    const fruit = await db('tbl_fruits').where({ id }).select('id', 'name', 'createdBy').first();
+    if (!fruit) {
+      return res.status(404).json({ ...notFoundMessage, success: false });
+    }
+    res.status(200).json({
+      message: 'Fruit retrieved successfully',
+      data: { fruit },
+      success: true
+    });
+  } catch (error) {
+    console.error(`Error fetching fruit with id ${id}:`, error);
+    res.status(500).json({ ...errorMessage, success: false });
+  }
+};
+
+export const deleteFruitById = async (req, res) => {
+  const { id } = req.params;
+
+  if (!/^\d+$/.test(id) || parseInt(id, 10) <= 0) {
+    return res.status(400).json({
+      message: 'Invalid ID format. ID must be a positive integer',
+      success: false
+    });
+  }
+
+  try {
+    const affectedRows = await db('tbl_fruits').where({ id }).del();
+    if (affectedRows === 0) {
+      return res.status(404).json({ ...notFoundMessage, success: false });
+    }
+    res.status(200).json({
+      message: `Fruit with id ${id} deleted successfully`,
+      success: true
+    });
+  } catch (error) {
+    console.error(`Error deleting fruit with id ${id}:`, error);
+    res.status(500).json({ ...errorMessage, success: false });
+  }
+};
+
+/* Previous coding using mysql2
 export const getAllFruits = async (_, res) => {
     let connection;
     try {
@@ -135,4 +238,4 @@ export const deleteFruitById = async (req, res) => {
             }
         }
     }
-};
+};*/
