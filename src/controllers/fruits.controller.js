@@ -98,7 +98,7 @@ export const deleteFruitById = async (req, res) => {
 
   try {
     const affectedRows = await db('tbl_fruits').where({ id }).del();
-    if (affectedRows === 0) {
+    if (!affectedRows) {
       return res.status(404).json({ ...notFoundMessage, success: false });
     }
     res.status(200).json({
