@@ -1,31 +1,53 @@
 import express from 'express';
+import {
+    getAllFruits,
+    getFruitById,
+    createFruit,
+    updateFruit,
+    deleteFruit
+} from './src/controllers/fruits.controller.js';
+
+import {
+    getAllUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser
+} from './src/controllers/user.controller.js'; 
+
+import {
+    getAllPosts,
+    getPostById,
+    createPost,
+    updatePost,
+    deletePost
+} from './src/controllers/post.controller.js';
 
 const app = express(); // instance (singleton)
-
-const fruits = []; // in memory
 
 // middleware
 app.use(express.json());
 
-app.get('/fruits', (request, response) => {
-  response.send({
-    message: 'Fruits in the storage',
-    fruits
-  });
-});
+// Fruit Routes
+app.get('/fruits', getAllFruits);
+app.get('/fruits/:id', getFruitById);
+app.post('/fruits', createFruit);
+app.put('/fruits/:id', updateFruit);
+app.delete('/fruits/:id', deleteFruit);
 
-app.post('/fruit', (req, res) => {
-  const { fruit } = req.body;
-  if (!!fruit) {
-    // Add validation to prevent repeated fruits
-    fruits.push(fruit);
-  }
+// User Routes 
+app.get('/users', getAllUsers);         
+app.post('/users', createUser);        
+app.get('/users/:id', getUserById);   
+app.put('/users/:id', updateUser);   
+app.delete('/users/:id', deleteUser); 
 
-  res.send({
-    message: 'Fruit is in the storage',
-    ok: true
-  });
-});
+// Post Routes
+app.get('/posts', getAllPosts);        
+app.post('/posts', createPost);       
+app.get('/posts/:id', getPostById);  
+app.put('/posts/:id', updatePost);    
+app.delete('/posts/:id', deletePost);
 
 app.listen(5000, (error) => {
   if (error) {
