@@ -1,14 +1,14 @@
-import { getDbConnection } from '../config/db.js';
+import { getDbConnection } from "../config/db.js";
 import {
   createFruitsQuery,
-  getAllFruitsQuery
-} from '../query/fruitsQueries.js';
+  getAllFruitsQuery,
+} from "../query/fruitsQueries.js";
 
 const errorMessage = {
-  message: 'Something went wrong!'
+  message: "Something went wrong!",
 };
 
-const fruitsTable = 'tbl_fruits';
+const fruitsTable = "tbl_fruits";
 
 export const getAllFruits = async (_, response) => {
   const knex = await getDbConnection();
@@ -20,7 +20,7 @@ export const getAllFruits = async (_, response) => {
     const results = await knex.select().from(fruitsTable);
 
     response.send({
-      fruits: results
+      fruits: results,
     });
   } catch (error) {
     console.log(error);
@@ -32,12 +32,12 @@ export const createFruit = async (req, res) => {
   const { fruit } = req.body;
   const parsedFruit = fruit.toLowerCase();
   const successResponse = {
-    message: 'Fruit is in the storage'
+    message: "Fruit is in the storage",
   };
 
   if (!fruit) {
     res.send({
-      message: 'Fruit name is required'
+      message: "Fruit name is required",
     });
     return;
   }
@@ -49,8 +49,7 @@ export const createFruit = async (req, res) => {
   }
 
   try {
-    // await connection.query(createFruitsQuery, [parsedFruit, 'Admin']);
-    await knex(fruitsTable).insert({ name: parsedFruit, createdBy: 'Admin' });
+    await knex(fruitsTable).insert({ name: parsedFruit, createdBy: "Admin" });
   } catch (error) {
     console.log(error);
     res.send(errorMessage);
@@ -59,18 +58,46 @@ export const createFruit = async (req, res) => {
   res.send(successResponse);
 };
 
-export const getFruitById = (req, res) => {
-  // const fruitId = req.params.id
+export const getFruitById = async (req, res) => {
   const { id } = req.params;
 
-  console.log(req.query);
-  console.log({ param: id });
+  if (!id) {
+    return res.status(400).json({ message: "Missing fruit ID" });
+  }
 
-  // const fruit = {
-  //   id: 1,
-  //   name: 'orange',
-  //   creator: 'Carlos'
-  // }
+  try {
+    const fruit = await knex("tbl_fruits")
+      .select("id", "name", "createdBy as creator")
+      .where({ id })
+      .first();
 
-  res.send({ id });
+    if (!fruit) {
+      return res.status(404).json({ message: "Fruit not found" });
+    }
+
+    res.status(200).json(fruit);
+  } catch (error) {
+    console.error("Error retrieving fruit:", error.message);
+    res.status(500).json({ message: "Database error" });
+  }
+};
+
+// fruits.controller.js
+import { deleteFruitQuery } from "../query/fruitsQueries.js";
+
+export const deleteFruitById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const fruitId = parseInt(id);
+
+    if (isNaN(fruitId)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
+
+    const result = await deleteFruitQuery(fruitId); // ✅ Solo el número
+    res.status(200).json({ message: "Fruit deleted", result });
+  } catch (error) {
+    console.error("Error deleting fruit:", error.message);
+    res.status(500).json({ message: "Database error" });
+  }
 };
