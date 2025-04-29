@@ -3,6 +3,7 @@ import {
   createFruit,
   getAllFruits,
   getFruitById,
+  updateFruit,
   deleteFruitById
 } from './src/controllers/fruits.controller.js';
 
@@ -31,6 +32,7 @@ app.use(express.json());
 app.get('/fruits', getAllFruits);
 app.get('/fruits/:id', getFruitById);
 app.post('/fruits', createFruit);
+app.put('/fruits/:id', updateFruit);
 app.delete('/fruits/:id', deleteFruitById);
 
 // User Routes 

@@ -60,6 +60,66 @@ export const createFruit = async (req, res) => {
   }
 };
 
+export const updateFruit = async (req, res) => {
+    const { id } = req.params;
+    const { fruit } = req.body;
+
+    if (!/^\d+$/.test(id) || parseInt(id, 10) <= 0) {
+        return res.status(400).json({ message: 'Invalid ID format. ID must be a positive integer', success: false });
+    }
+
+    if (fruit === undefined || fruit === null || typeof fruit !== 'string' || fruit.trim() === '') {
+         return res.status(400).json({ message: 'Fruit name is required and must be a non-empty string for update', success: false });
+    }
+
+    const parsedFruit = fruit.trim().toLowerCase();
+
+    const updateData = { name: parsedFruit };
+
+    try {
+        const existingFruitWithNewName = await db('tbl_fruits')
+            .whereRaw('LOWER(name) = ?', [parsedFruit]) 
+            .whereNot({ id: id }) 
+            .first();
+
+        if (existingFruitWithNewName) {
+            return res.status(409).json({
+                message: `Another fruit with the name '${parsedFruit}' already exists`,
+                success: false
+            });
+        }
+
+        const affectedRows = await db('tbl_fruits')
+            .where({ id: id }) 
+            .update(updateData); 
+
+        if (affectedRows === 0) {
+
+            const fruitExists = await db('tbl_fruits').where({id}).first();
+
+             return res.status(fruitExists ? 200 : 404).json({
+                 message: fruitExists ? 'Fruit updated successfully (no change detected).' : 'Fruit not found.',
+                 success: fruitExists 
+             });
+        }
+
+        const updatedFruit = await db('tbl_fruits').where({ id }).first(); 
+
+        res.status(200).json({
+            message: 'Fruit updated successfully',
+            data: { fruit: updatedFruit },
+            success: true
+        });
+
+    } catch (error) {
+        console.error(`Error updating fruit ${id}:`, error);
+        if (error.code === 'ER_DUP_ENTRY' || error.message.includes('UNIQUE constraint')) {
+           return res.status(409).json({ message: `Fruit name '${parsedFruit}' likely already exists (DB constraint).`, success: false });
+        }
+        res.status(500).json({ ...errorMessage, success: false });
+    }
+};
+
 export const getFruitById = async (req, res) => {
   const { id } = req.params;
 
