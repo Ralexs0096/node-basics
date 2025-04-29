@@ -29,9 +29,9 @@ app.use(express.json());
 
 // Fruit Routes
 app.get('/fruits', getAllFruits);
-app.get('/fruit/:id', getFruitById);
-app.post('/fruit', createFruit);
-app.delete('/fruit/:id', deleteFruitById);
+app.get('/fruits/:id', getFruitById);
+app.post('/fruits', createFruit);
+app.delete('/fruits/:id', deleteFruitById);
 
 // User Routes 
 app.get('/users', getAllUsers);         
