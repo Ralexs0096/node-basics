@@ -55,7 +55,7 @@ export const createUser = async (req, res) => {
         const createdUser = await db('users').where({ id: insertedId }).select(SAFE_USER_COLUMNS).first();
 
         res.status(201).json({
-            message: 'User created successfully (INSECURE PASSWORD STORAGE)',
+            message: 'User created successfully',
             data: { user: createdUser },
             success: true
         });
