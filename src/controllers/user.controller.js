@@ -2,12 +2,12 @@ import db from '../config/database.js';
 
 const errorMessage = { message: 'Something went wrong on the server.' };
 const notFoundMessage = { message: 'User not found.' };
-const SAFE_USER_COLUMNS = ['id', 'username', 'email', 'created_at']; 
+const USER_COLUMNS = ['id', 'username', 'email', 'created_at']; 
 
 
 export const getAllUsers = async (_, res) => {
     try {
-        const users = await db('users').select(SAFE_USER_COLUMNS);
+        const users = await db('users').select(USER_COLUMNS);
         res.status(200).json({
             message: 'Users retrieved successfully',
             data: { users },
@@ -28,7 +28,7 @@ export const getUserById = async (req, res) => {
     }
 
     try {
-        const user = await db('users').where({ id }).select(SAFE_USER_COLUMNS).first();
+        const user = await db('users').where({ id }).select(USER_COLUMNS).first();
         if (!user) {
             return res.status(404).json({ ...notFoundMessage, success: false });
         }
@@ -52,7 +52,7 @@ export const createUser = async (req, res) => {
         const newUser = { username, email, password: password }; 
 
         const [insertedId] = await db('users').insert(newUser);
-        const createdUser = await db('users').where({ id: insertedId }).select(SAFE_USER_COLUMNS).first();
+        const createdUser = await db('users').where({ id: insertedId }).select(USER_COLUMNS).first();
 
         res.status(201).json({
             message: 'User created successfully',
@@ -94,7 +94,7 @@ export const updateUser = async (req, res) => {
             return res.status(userExists ? 200 : 404).json({ message: userExists ? 'User updated successfully (no change detected).' : 'User not found.', success: userExists });
         }
 
-        const updatedUser = await db('users').where({ id }).select(SAFE_USER_COLUMNS).first();
+        const updatedUser = await db('users').where({ id }).select(USER_COLUMNS).first();
 
         res.status(200).json({
             message: 'User updated successfully',
