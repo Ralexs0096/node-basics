@@ -1,10 +1,10 @@
 import express from 'express';
 import {
-  createFruit,
-  getAllFruits,
-  getFruitById,
-  updateFruit,
-  deleteFruitById
+    getAllFruits,
+    getFruitById,
+    createFruit,
+    updateFruit,
+    deleteFruit
 } from './src/controllers/fruits.controller.js';
 
 import {
@@ -33,7 +33,7 @@ app.get('/fruits', getAllFruits);
 app.get('/fruits/:id', getFruitById);
 app.post('/fruits', createFruit);
 app.put('/fruits/:id', updateFruit);
-app.delete('/fruits/:id', deleteFruitById);
+app.delete('/fruits/:id', deleteFruit);
 
 // User Routes 
 app.get('/users', getAllUsers);         

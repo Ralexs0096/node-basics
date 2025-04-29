@@ -146,7 +146,7 @@ export const getFruitById = async (req, res) => {
   }
 };
 
-export const deleteFruitById = async (req, res) => {
+export const deleteFruit = async (req, res) => {
   const { id } = req.params;
 
   if (!/^\d+$/.test(id) || parseInt(id, 10) <= 0) {
