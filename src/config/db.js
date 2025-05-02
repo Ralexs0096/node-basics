@@ -8,7 +8,7 @@ export const getDbConnection = async () => {
         host: "localhost",
         port: 3306,
         user: "root",
-        database: "fruits_db",
+        database: "users_db",
         password: "my-secret-pw",
       },
     });
